@@ -6,6 +6,7 @@ require (
 	github.com/LK4D4/joincontext v0.0.0-20171026170139-1724345da6d5 // indirect
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
+	github.com/google/gousb v0.0.0-20190812193832-18f4c1d8a750
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75 // indirect
 	github.com/hashicorp/consul/api v1.2.0 // indirect
 	github.com/hashicorp/go-hclog v0.9.1
@@ -18,6 +19,7 @@ require (
 	github.com/hashicorp/vault/api v1.0.4 // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/mitchellh/hashstructure v1.0.0 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/shirou/gopsutil v0.0.0-00010101000000-000000000000 // indirect
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
 	github.com/ugorji/go v0.0.0-00010101000000-000000000000 // indirect

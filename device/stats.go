@@ -5,11 +5,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/nomad/plugins/device"
-	"github.com/hashicorp/nomad/plugins/shared/structs"
 )
 
 // doStats is the long running goroutine that streams device statistics
-func (d *SkeletonDevicePlugin) doStats(ctx context.Context, stats chan<- *device.StatsResponse, interval time.Duration) {
+func (d *RTL2838DevicePlugin) doStats(ctx context.Context, stats chan<- *device.StatsResponse, interval time.Duration) {
 	defer close(stats)
 
 	// Create a timer that will fire immediately for the first detection
@@ -33,12 +32,11 @@ func (d *SkeletonDevicePlugin) doStats(ctx context.Context, stats chan<- *device
 type deviceStats struct {
 	ID         string
 	deviceName string
-	usedMemory int64
 }
 
 // writeStatsToChannel collects device stats, partitions devices into
 // device groups, and sends the data over the provided channel.
-func (d *SkeletonDevicePlugin) writeStatsToChannel(stats chan<- *device.StatsResponse, timestamp time.Time) {
+func (d *RTL2838DevicePlugin) writeStatsToChannel(stats chan<- *device.StatsResponse, timestamp time.Time) {
 	statsData, err := d.collectStats()
 	if err != nil {
 		d.logger.Error("failed to get device stats", "error", err)
@@ -67,16 +65,15 @@ func (d *SkeletonDevicePlugin) writeStatsToChannel(stats chan<- *device.StatsRes
 	}
 }
 
-func (d *SkeletonDevicePlugin) collectStats() ([]*deviceStats, error) {
+func (d *RTL2838DevicePlugin) collectStats() ([]*deviceStats, error) {
 	d.deviceLock.RLock()
 	defer d.deviceLock.RUnlock()
 
 	stats := []*deviceStats{}
-	for ID, name := range d.devices {
+	for ID, dev := range d.devices {
 		stats = append(stats, &deviceStats{
 			ID:         ID,
-			deviceName: name,
-			usedMemory: 128,
+			deviceName: dev.name,
 		})
 	}
 
@@ -89,22 +86,7 @@ func statsForGroup(groupName string, groupStats []*deviceStats, timestamp time.T
 	instanceStats := make(map[string]*device.DeviceStats)
 
 	for _, statsItem := range groupStats {
-		memStat := &structs.StatValue{
-			IntNumeratorVal: &statsItem.usedMemory,
-			Unit:            "MiB",
-			Desc:            "Memory in use by the device",
-		}
-
 		instanceStats[statsItem.ID] = &device.DeviceStats{
-			// Summary exposes a single summary metric that should be the most
-			// informative to users.
-			Summary: memStat,
-			// Stats contains the verbose statistics for the device.
-			Stats: &structs.StatObject{
-				Attributes: map[string]*structs.StatValue{
-					"Used Memory": memStat,
-				},
-			},
 			// Timestamp is the time the statistics were collected.
 			Timestamp: timestamp,
 		}
